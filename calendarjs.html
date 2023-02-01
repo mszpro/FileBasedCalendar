@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Local file based calendar system</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" user-scalable="no">
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="src/calendarjs.css" />
+    <script src="src/calendarjs.js"></script>
+</head>
+
+<body>
+    <h1 id="header">Local file based calendar system</h1>
+
+    <br>
+
+    <div class="contents">
+
+        <div id="fileActions">
+            <h2>Features:</h2>
+            <p>The calendar data is stored in a file. When you load a calendar, select the calendar data file; when you
+                finish the modifications, save the calendar data file (or share it with others).</p>
+            <p>カレンダーデータは、ファイルに保存されます。</p>
+            <p>カレンダーを読み込むときに、カレンダーデータファイルを選択します。</p>
+            <p>修正が終わったら、カレンダーデータファイルを保存（または共有）します。</p>
+            <button onclick="pickFileAndLoadEvents();">Load calendar data file カレンダーデータファイルの読み込み</button>
+            <button onclick="saveEvents();">Save calendar data file カレンダーデータファイルの保存</button>
+            <br>
+            <br>
+        </div>
+
+        <div id="myCalendar" style="width: 100%;">
+            <p>Some data that should be cleared.</p>
+        </div>
+
+        <br>
+
+    </div>
+</body>
+
+<script>
+    var calendarInstance = new calendarJs("myCalendar", {
+        exportEventsEnabled: true,
+        manualEditingEnabled: true,
+        showTimesInMainCalendarEvents: false,
+        minimumDayHeight: 0,
+        organizerName: "Local Calendar System",
+        organizerEmailAddress: "your@email.address",
+        visibleDays: [0, 1, 2, 3, 4, 5, 6],
+        showExtraToolbarButtons: true
+    });
+
+    document.title += " v" + calendarInstance.getVersion();
+    document.getElementById("header").innerText += " v" + calendarInstance.getVersion();
+
+    function turnOnEventNotifications() {
+        calendarInstance.setOptions({
+            eventNotificationsEnabled: true
+        });
+    }
+
+    function pickFileAndLoadEvents() {
+        var input = document.createElement('input');
+        input.type = 'file';
+
+        input.onchange = e => {
+
+            // getting a hold of the file reference
+            var file = e.target.files[0];
+
+            // setting up the reader
+            var reader = new FileReader();
+            reader.readAsText(file, 'UTF-8');
+
+            // here we tell the reader what to do when it's done reading...
+            reader.onload = readerEvent => {
+                var content = readerEvent.target.result; // this is the content!
+                console.log(content);
+                var events = getEvents(content);
+                calendarInstance.setEvents(events);
+            }
+
+        }
+
+        input.click();
+    }
+
+    function getEvents(inputData) {
+        // Get the events from the local json file
+        var allCalendarData = JSON.parse(inputData);
+        var allEvents = [];
+        allCalendarData.forEach(function (calendarEntry) {
+            console.log(calendarEntry);
+            // parse meta data from JSON file
+            let parsedStartDate = new Date(calendarEntry.from);
+            let parsedEndDate = new Date(calendarEntry.to);
+            let eventTitle = calendarEntry.title;
+            let eventDescription = calendarEntry.description;
+            let eventLocation = calendarEntry.location;
+            let eventGroup = calendarEntry.group;
+            allEvents.push(
+                {
+                    from: parsedStartDate,
+                    to: parsedEndDate,
+                    title: eventTitle,
+                    description: eventDescription,
+                    location: eventLocation,
+                    group: eventGroup
+                }
+            )
+        });
+        return allEvents;
+    }
+
+    function daysInMonth(year, month) {
+        return new Date(year, month + 1, 0).getDate();
+    }
+
+    function setOptions() {
+        calendarInstance.setOptions({
+            minimumDayHeight: 70,
+            manualEditingEnabled: false,
+            exportEventsEnabled: false,
+            showDayNumberOrdinals: false,
+            fullScreenModeEnabled: false,
+            maximumEventsPerDayDisplay: 0,
+            showTimelineArrowOnFullDayView: false,
+            maximumEventTitleLength: 10,
+            maximumEventDescriptionLength: 10,
+            maximumEventLocationLength: 10,
+            maximumEventGroupLength: 10,
+            showDayNamesInMainDisplay: false,
+            tooltipsEnabled: true,
+            visibleDays: [0, 1, 2, 3, 4],
+            allowEventScrollingOnMainDisplay: true,
+            showExtraToolbarButtons: false,
+            hideEventsWithoutGroupAssigned: true,
+            showHolidays: false,
+            allowHtmlInDisplay: true
+        });
+    }
+
+    function setSearchOptions() {
+        calendarInstance.setSearchOptions({
+            left: 10,
+            top: 10
+        });
+    }
+
+    function onlyDotsDisplay() {
+        calendarInstance.setOptions({
+            useOnlyDotEventsForMainDisplay: true
+        });
+    }
+
+    function setCurrentDisplayDate() {
+        var newDate = new Date();
+        newDate.setMonth(newDate.getMonth() + 3);
+
+        calendarInstance.setCurrentDisplayDate(newDate);
+    }
+
+    function saveEvents() {
+        var allEvents = calendarInstance.getEvents();
+        console.log(allEvents);
+        var allEventJSONObjects = [];
+        // Generate the json representation
+        allEvents.forEach(function (eventEntry) {
+            allEventJSONObjects.push(
+                {
+                    "from": eventEntry.from.toISOString(),
+                    "to": eventEntry.to.toISOString(),
+                    "title": eventEntry.title,
+                    "description": eventEntry.description,
+                    "location": eventEntry.location,
+                    "group": eventEntry.group
+                }
+            )
+        });
+        // generate JSON string
+        let generatedJSONString = JSON.stringify(allEventJSONObjects);
+        console.log(generatedJSONString);
+        // save to file
+        download_file("calendar_data.js", generatedJSONString);
+    }
+
+    function download_file(name, contents, mime_type) {
+        mime_type = mime_type || "text/plain";
+
+        var blob = new Blob([contents], { type: mime_type });
+
+        var dlink = document.createElement('a');
+        dlink.download = name;
+        dlink.href = window.URL.createObjectURL(blob);
+        dlink.onclick = function (e) {
+            // revokeObjectURL needs a delay to work properly
+            var that = this;
+            setTimeout(function () {
+                window.URL.revokeObjectURL(that.href);
+            }, 1500);
+        };
+
+        dlink.click();
+        dlink.remove();
+    }
+
+    function saveTxtToFile(fileName, textData) {
+        const blobData = new Blob([textData], { type: 'text/plain' });
+        const urlToBlob = window.URL.createObjectURL(blobData);
+
+        const a = document.createElement('a');
+        a.style.setProperty('display', 'none');
+        document.body.appendChild(a);
+        a.href = urlToBlob;
+        a.download = fileName;
+        a.click();
+        window.URL.revokeObjectURL(urlToBlob);
+        a.remove();
+    }
+</script>
+
+</html>
