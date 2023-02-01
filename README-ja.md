@@ -10,6 +10,8 @@
 
 [ここをクリック](https://github.com/mszpro/FileBasedCalendar/archive/refs/tags/1.0.0.zip)して、最新のリリースをダウンロードすることができます。
 
+実行するには、ファイルを解凍し、"calendarjs.html"を開いてください。
+
 ## なぜこれを使うのか？
 
 - オンラインカレンダーシステムを利用したくない場合
