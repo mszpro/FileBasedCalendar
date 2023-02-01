@@ -8,7 +8,7 @@
 
 ## ダウンロード方法は？
 
-ここをクリックして、最新のリリースをダウンロードすることができます。
+[ここをクリック](https://github.com/mszpro/FileBasedCalendar/archive/refs/tags/1.0.0.zip)して、最新のリリースをダウンロードすることができます。
 
 ## なぜこれを使うのか？
 
