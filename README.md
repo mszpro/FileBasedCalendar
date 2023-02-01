@@ -4,7 +4,7 @@ This calendar uses a local JSON file for storing the data. Thus, you can load th
 
 ## How to download?
 
-You can click here to download the latest release.
+You can [click here](https://github.com/mszpro/FileBasedCalendar/archive/refs/tags/1.0.0.zip) to download the latest release.
 
 ## Why use this?
 
