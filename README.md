@@ -6,6 +6,8 @@ This calendar uses a local JSON file for storing the data. Thus, you can load th
 
 You can [click here](https://github.com/mszpro/FileBasedCalendar/archive/refs/tags/1.0.0.zip) to download the latest release.
 
+To run the program, unzip the file, and open the "calendarjs.html"
+
 ## Why use this?
 
 - When you do not want to use online calendar systems
